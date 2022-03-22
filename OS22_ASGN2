@@ -1,0 +1,128 @@
+#!/bin/bash
+
+echo "[/!/!/] SCRIPT INFORMATION [/!/!/]"
+echo "SCRIPT TYPE: BASH"
+echo "Creation Date (Fin.): Feb 8 - 17:26 PM"
+echo "Author: Rialey, K-J. (W0452525)"
+echo "Current CHMOD: 700"
+echo "----------------------------------------------------------------------------"
+echo " "
+echo " "
+
+# ROOT VARIABLES
+ERROR_LOG=/bin/Scripts/Bash/errorCache.log
+CACHE=/bin/Scripts/Bash/scriptCashe.log
+
+NETWORK_CONNECTION='command hostnamectl status' # NETWORK CONNECTION COMMANDS
+alias NET_CONN=$NETWORK_CONNECTION # SHORTER VERSION - SAME AS ABOVE
+
+# GUI (USER) INTERFACE
+echo "Choose one of the following options (0-5):"
+echo "----------------------------------------------------------------------------"
+
+##### INTERFACE OPTION "0" TO LIST ALL (ACTIVE) SERVICES #####
+read -p "[0] LIST ACTIVE SERVICES" listServices
+if [ listServices -eq 0 ]; then
+    echo "DISPLAYING ACTIVE SERVICES:"
+    echo "----------------------------------------------------------------------------"
+    sudo systemctl list-units --type=service --state=active --all --no-pager
+    sudo systemctl list-units --type=service --state=active --all --no-pager >> $CACHE
+else
+    echo "FUNCTIONS ERROR-CODE 01  //OR//  INVALID INPUT"
+fi
+
+##### INTERFACE OPTION "1" TO LIST AND EDIT ALL SERVICES #####
+read -p "[1] EDIT ACTIVE SERVICES" editServices
+if [ editServices -eq 1 ]; then
+    echo "WARNING - THE USER IS EDITING ACTIVE SERVICES ON THIS DEVICE - WARNING" # EXTRA WARNING FOR CLIENT-SIDE
+    echo "DISPLAYING ACTIVE SERVICES..."
+    echo "----------------------------------------------------------------------------"
+    sudo systemctl list-units --type=service --all --no-pager
+    sudo systemctl list-units --type=service --all --no-pager >> $CACHE
+else
+    echo "FUNCTIONS ERROR-CODE 02  //OR//  INVALID INPUT"
+fi
+
+##### INTERFACE OPTION "2" TO DISPLAY THE CONNECTION STATUS #####
+### TRUE = ACTIVE INT. CONNECTION | FALSE = INACTIVE INT. CONNECTION ###
+read -p "[2] INTERNET STATUS" internetStatus
+if [ internetStatus -eq 2 ]; then
+    echo "DISPLAYING INTERNET CONNECTION (T/F):"
+    echo "----------------------------------------------------------------------------"
+    sudo $NET_CONN >> $CACHE # [Alias] CALLING THE COMMANDS: hostnamectl status (temp)
+else
+    echo "FUNCTIONS ERROR-CODE 03  //OR//  INVALID INPUT"
+fi
+
+##### INTERFACE OPTION "3" TO DISPLAY THE KERNAL, MEMORY & STORAGE INFO + TOP 5 PROCESSES #####
+read -p "[3] DEVICE STATUS" deviceStatus # Kernal Information + Basic Script Usage (Stat information)
+if [ deviceStatus -eq 3 ]; then
+    echo "DISPLAYING DEVICE INFORMATION (MAY TAKE A MOMENT):"
+    echo "----------------------------------------------------------------------------"
+    netstat >> $CACHE # temp
+else
+    echo "FUNCTIONS ERROR-CODE 03  //OR//  INVALID INPUT"
+fi
+
+##### INTERFACE OPTION "4" TO DISPLAY THE FIREWALL STATUS & PORTS #####
+read -p "[4] SYSTEM STATUS" systemStatus # UFW Status
+if [ systemStatus -eq 4 ]; then
+    echo "DISPLAYING SYSTEM INFORMATION (MAY TAKE A MOMENT):"
+    echo "----------------------------------------------------------------------------"
+    # Hostname
+    sudo hostnamectl status >> $CACHE
+
+    # Up-time
+    #// >> $CACHE
+
+    # IPv4 Address
+    command ip a /dev/null >> $ERROR_LOG
+    sudo ufw status >> $CACHE # Firewall Status # IN PLACE OF THE DISCON, CONN, UP/DOWN, POS, NEGATIVE COMMANDS.
+    
+    CONNECTION_COMMAND_OPTIONS='Connected','Disconnected','Up','Down','Positive','Negative'
+    alias CCMD=CONNECTION_COMMAND_OPTIONS # Appropriate names make both the alias and the variable easier to find later.
+    read -sp "" CCMD
+    if [ $CCMD -eq ]; then
+        
+    netstat -ltu # Ports Status [-l means All; -t means TCP; -u means UDP; -p means shows numbers instead of application name]
+else
+    echo "FUNCTIONS ERROR-CODE 04  //OR//  INVALID INPUT"
+fi
+
+
+# NAME OF THIS CURRENT USER (OPTIONAL)
+USER="architect"
+#SETTING THE FILEPATH FOR FUTURE USE (SET CORRECTLY; USE # TO COMMENT OUT THE INCORRECT DIRECTORIES!)
+FILEPATH=/usr/bin/Scripts/Bash/osys2022_assign2_output.txt # IF THE ABOVE (USER) VARIABLE ISN'T FILLED CORRECTLY, LEAVE IT BLANK AND CHANGE THE $USER FROM THIS LINE TO YOUR MACHINE NAME.
+FILEDIR=/usr/bin/Scripts/Bash
+#FILEDIR=/home/$USER/Desktop/Scripts/Bash
+#FILEDIR=/home/$USER/Desktop/Scripts/
+
+# MUST BE BEFORE MEMORY
+##Using a NON-NATIVE PKG TO AUTOMATE THIS SCRIPT (ALL OTHER PARTS IN THIS CMD).
+source $FILEDIR/eventCheck.sh
+
+echo "[///] Memory Availability (Usage): [///]"
+echo "----------------------------------------------------------------------------"
+#Using a NATIVE COMMAND (To Ubuntu v20.04.3 LTS+) to check the current available memory on the system.
+# Typing the command once for the user/terminal-sided interface and another for the logfile to save (this goes for every integral command used).
+free
+free >> $FILEPATH
+echo " "
+echo " "
+echo "[///] Hard Drive Availability (Usage): [///]"
+echo "----------------------------------------------------------------------------"
+#Using a NATIVE COMMAND (To Ubuntu v20.04.3 LTS+) to check the available hard drive space on the sytem.
+# Typing the command once for the user/terminal-sided interface and another for the logfile to save.
+hostnamectl status
+hostnamectl status >> $FILEPATH
+echo " "
+echo " "
+echo "[///] Top Processes Running - Sorted via Memory Usage (0.0 up to 1.0~) [///]"
+#Using a NATIVE COMMAND (To Ubuntu v20.04.3 LTS+) to check the TOP 5 biggest usage(s) of memory in the system (e.g. Google Chrome).
+# Typing the command once for the user/terminal-sided interface and another for the logfile to save.
+echo "----------------------------------------------------------------------------"
+ps aux | sort -nk +4 | head -n 5
+ps aux | sort -nk +4 | head -n 5 >> $FILEPATH
+echo "----------------------------------------------------------------------------"
+echo "Script  Complete..."
