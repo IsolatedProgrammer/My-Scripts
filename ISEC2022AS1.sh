@@ -6,7 +6,7 @@
 
 # NAME: IPTABLES_SCRIPT (Temporary)
 # ASSIGNMENT INFO: ISEC2022 Assignment1 Information
-# AUTHOR: Rialey, Kelly-Johnson (W0452525)
+# AUTHOR: Rialey, K-J.
 # CREATION DATE: January 28, 2022
 # LATEST UPDATE: February 10 (23:36PM), 2022
 
